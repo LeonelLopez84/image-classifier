@@ -54,12 +54,10 @@ def login(username: str, password: str) -> Optional[str]:
     
     # 4. Enviar petición POST
     response = requests.post(url, headers=headers, data=data)
-    
-    # 5. Verificar éxito y extraer token
     if response.status_code == 200:
-        return response.json().get("access_token")
-    
-    return None
+        return response.json()["access_token"]
+    else:
+        return None
 
 
 def predict(token: str, uploaded_file: Image) -> requests.Response:
@@ -86,7 +84,7 @@ def predict(token: str, uploaded_file: Image) -> requests.Response:
     url = f"{API_BASE_URL}/model/predict"
     
     # 1. Preparar el archivo para el envío multi-part
-    files = {"file": (uploaded_file.name, uploaded_file.getvalue(), uploaded_file.type)}
+    files = {"file": (uploaded_file.name, uploaded_file.getvalue())}
     
     # 2. Agregar el token de autorización
     headers = {"Authorization": f"Bearer {token}"}
@@ -134,8 +132,7 @@ def send_feedback(
     }
     
     headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
+        "Authorization": f"Bearer {token}"
     }
 
     # 2. Enviar petición POST con JSON
@@ -171,14 +168,14 @@ if "token" in st.session_state:
     token = st.session_state.token
 
     # Cargar imagen
-    uploaded_file = st.file_uploader("Sube una imagen", type=["jpg", "jpeg", "png"])
+    uploaded_file = st.file_uploader("Upload an Image", type=["jpg", "jpeg", "png"])
 
     print(type(uploaded_file))
 
     # Mostrar imagen escalada si se ha cargado
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
-        st.image(image, caption="Imagen subida", width=300)
+        st.image(image, caption="Loaded Image", width=300)
 
     if "classification_done" not in st.session_state:
         st.session_state.classification_done = False

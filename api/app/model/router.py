@@ -15,8 +15,10 @@ router = APIRouter(tags=["Model"], prefix="/model")
 
 @router.post("/predict")
 async def predict(file: UploadFile, current_user=Depends(get_current_user)):
+
+    filename = getattr(file, "filename", "")
     
-    if not utils.allowed_file(file.filename):
+    if not utils.allowed_file(filename):
         raise HTTPException(
             status_code=400,
             detail="File type is not supported."

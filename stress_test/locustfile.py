@@ -55,7 +55,7 @@ class APIUser(HttpUser):
         headers = {"Authorization": f"Bearer {token}"}
         payload = {}
         self.client.post(
-            "http://0.0.0.0:8000/model/predict",
+            "http://localhost:8000/model/predict",
             headers=headers,
             data=payload,
             files=files,
