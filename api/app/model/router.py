@@ -15,30 +15,28 @@ router = APIRouter(tags=["Model"], prefix="/model")
 
 @router.post("/predict")
 async def predict(file: UploadFile, current_user=Depends(get_current_user)):
-    # 1. Validate extension
+    
     if not utils.allowed_file(file.filename):
-         raise HTTPException(status_code=400, detail="Invalid file type")
+        raise HTTPException(
+            status_code=400,
+            detail="File type is not supported."
+        )
 
-    # 2. Read content and calcualte hash
+    image_name = await utils.get_file_hash(file)
+    
     file_content = await file.read()
-
-    file_hash = await utils.get_file_hash(file_content)
     
-    extension = os.path.splitext(file.filename)[1].lower()
-    image_name = f"{file_hash}{extension}"
-    
-    # 3. save file
     img_path = os.path.join(config.UPLOAD_FOLDER, image_name)
     if not os.path.exists(img_path):
         with open(img_path, "wb") as f:
             f.write(file_content)
 
-    # 4. get prodiction
+    # 5. Predicction
     prediction, score = await model_predict(image_name)
     
     return PredictResponse(
         success=True, 
         prediction=prediction, 
-        score=score, 
+        score=round(float(score), 4),
         image_file_name=image_name
     )

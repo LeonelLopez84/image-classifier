@@ -56,4 +56,16 @@ async def get_file_hash(file):
     # Return file pointer to the beginning
 
     # Add original file extension
-    return hashlib.md5(file).hexdigest()
+    content = await file.read()
+    
+    # 2. Generar el hash MD5
+    hash_md5 = hashlib.md5(content).hexdigest()
+    
+    # 3. ¡CRUCIAL! Resetear el puntero al inicio (posición 0)
+    # Esto permite que la función predict() de la API pueda hacer 
+    # 'file_content = await file.read()' sin encontrar el archivo vacío.
+    await file.seek(0)
+    
+    # 4. Obtener la extensión y retornar el nombre completo
+    _, extension = os.path.splitext(file.filename)
+    return f"{hash_md5}{extension}"

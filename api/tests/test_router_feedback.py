@@ -57,7 +57,10 @@ def test_create_feedback(mock_new_feedback, mock_db_session, mock_get_current_us
 
     assert response.status_code == 201
 
-    mock_new_feedback.assert_called_once_with(payload, sample_user, mock_db_session)
+    args, kwargs = mock_new_feedback.call_args
+    assert args[0].dict() == payload  # Compara el contenido del objeto con el payload
+    assert args[1] == sample_user
+    assert args[2] == mock_db_session
 
 
 @mock.patch("app.feedback.router.services.all_feedback")

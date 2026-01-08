@@ -1,13 +1,13 @@
 import os
 from io import BytesIO
 
-import app.utils as utils
+import api.app.utils as utils
 import pytest
 from fastapi import UploadFile
 from werkzeug.datastructures import FileStorage
 
-
-def test_allowed_file():
+@pytest.mark.asyncio
+async def test_get_file_hash():
     assert utils.allowed_file("cat.JPG")
     assert utils.allowed_file("cat.jpeg")
     assert utils.allowed_file("cat.JPEG")
